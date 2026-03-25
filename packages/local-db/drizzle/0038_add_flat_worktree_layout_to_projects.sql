@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD `flat_worktree_layout` integer DEFAULT false NOT NULL;

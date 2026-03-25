@@ -427,6 +427,26 @@ export function ProjectSettings({
 						}
 					/>
 
+					<div className="flex items-center justify-between">
+						<div className="space-y-0.5">
+							<Label className="text-sm font-medium">Flat layout</Label>
+							<p className="text-xs text-muted-foreground">
+								Create worktrees directly in the base directory without a
+								project name subdirectory.
+							</p>
+						</div>
+						<Switch
+							checked={project.flatWorktreeLayout}
+							disabled={updateProject.isPending}
+							onCheckedChange={(checked) =>
+								updateProject.mutate({
+									id: projectId,
+									patch: { flatWorktreeLayout: checked },
+								})
+							}
+						/>
+					</div>
+
 					{!isExternalLoading &&
 						externalWorktrees.length > 0 &&
 						isItemVisible(

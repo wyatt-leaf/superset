@@ -6,11 +6,19 @@ import { SUPERSET_DIR_NAME, WORKTREES_DIR_NAME } from "shared/constants";
 
 /** Resolves base dir: project override > global setting > default (~/.superset/worktrees) */
 export function resolveWorktreePath(
-	project: Pick<SelectProject, "name" | "worktreeBaseDir">,
+	project: Pick<
+		SelectProject,
+		"name" | "worktreeBaseDir" | "flatWorktreeLayout"
+	>,
 	branch: string,
 ): string {
+	const resolvePath = (baseDir: string) =>
+		project.flatWorktreeLayout
+			? join(baseDir, branch)
+			: join(baseDir, project.name, branch);
+
 	if (project.worktreeBaseDir) {
-		return join(project.worktreeBaseDir, project.name, branch);
+		return resolvePath(project.worktreeBaseDir);
 	}
 
 	const row = localDb.select().from(settings).get();
@@ -18,5 +26,5 @@ export function resolveWorktreePath(
 		row?.worktreeBaseDir ??
 		join(homedir(), SUPERSET_DIR_NAME, WORKTREES_DIR_NAME);
 
-	return join(baseDir, project.name, branch);
+	return resolvePath(baseDir);
 }

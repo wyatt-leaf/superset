@@ -42,6 +42,11 @@ export const projects = sqliteTable(
 		branchPrefixMode: text("branch_prefix_mode").$type<BranchPrefixMode>(),
 		branchPrefixCustom: text("branch_prefix_custom"),
 		worktreeBaseDir: text("worktree_base_dir"),
+		flatWorktreeLayout: integer("flat_worktree_layout", {
+			mode: "boolean",
+		})
+			.notNull()
+			.default(false),
 		hideImage: integer("hide_image", { mode: "boolean" }),
 		iconUrl: text("icon_url"),
 		neonProjectId: text("neon_project_id"),
