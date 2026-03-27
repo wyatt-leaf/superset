@@ -21,12 +21,14 @@ import {
 	LuListPlus,
 	LuPalette,
 	LuPencil,
+	LuRefreshCw,
 	LuSettings,
 	LuX,
 } from "react-icons/lu";
 import { ColorSelector } from "renderer/components/ColorSelector";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useUpdateProject } from "renderer/react-query/projects/useUpdateProject";
+import { useImportAllWorktrees } from "renderer/react-query/workspaces";
 import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useProjectRename } from "renderer/screens/main/hooks/useProjectRename";
 import { STROKE_WIDTH } from "../constants";
@@ -70,6 +72,20 @@ export function ProjectHeader({
 	const params = useParams({ strict: false }) as { workspaceId?: string };
 	const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
 	const rename = useProjectRename(projectId, projectName);
+
+	const importAllWorktrees = useImportAllWorktrees();
+
+	const handleImportWorktrees = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		importAllWorktrees.mutateAsync({ projectId }).then((result) => {
+			const count = result?.imported ?? 0;
+			if (count > 0) {
+				toast.success(`Imported ${count} worktree${count === 1 ? "" : "s"}`);
+			} else {
+				toast.info("No new worktrees found");
+			}
+		});
+	};
 
 	const closeProject = electronTrpc.projects.close.useMutation({
 		onMutate: async ({ id }) => {
@@ -305,6 +321,28 @@ export function ProjectHeader({
 								</span>
 							</button>
 						)}
+
+						<Tooltip delayDuration={500}>
+							<TooltipTrigger asChild>
+								<button
+									type="button"
+									onClick={handleImportWorktrees}
+									onContextMenu={(e) => e.stopPropagation()}
+									disabled={importAllWorktrees.isPending}
+									className="p-1 rounded hover:bg-muted transition-colors shrink-0 ml-1"
+								>
+									<LuRefreshCw
+										className={cn(
+											"size-3.5 text-muted-foreground",
+											importAllWorktrees.isPending && "animate-spin",
+										)}
+									/>
+								</button>
+							</TooltipTrigger>
+							<TooltipContent side="bottom" sideOffset={4}>
+								Import worktrees
+							</TooltipContent>
+						</Tooltip>
 
 						<Tooltip delayDuration={500}>
 							<TooltipTrigger asChild>
