@@ -77,7 +77,9 @@ export class NotificationManager {
 		const key = event.sessionId ?? event.paneId ?? `_anon_${this.counter++}`;
 		this.track(key, notification);
 
-		this.deps.playSound();
+		if (!isPermissionRequest) {
+			this.deps.playSound();
+		}
 
 		notification.on("click", () => {
 			this.deps.onNotificationClick({
